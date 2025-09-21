@@ -1,5 +1,5 @@
 use risc0_binfmt::ProgramBinary;
-use risc0_build::{embed_method_metadata_with_options, DockerOptionsBuilder, GuestOptionsBuilder};
+use risc0_build::{embed_method_metadata_with_options, GuestOptionsBuilder};
 use std::{collections::HashMap, env, fs::File, io::Write};
 
 fn main() {
@@ -14,26 +14,23 @@ fn main() {
         }
     }
 
-    // Builds can be made deterministic, and thereby reproducible, by using Docker to build the
-    // guest.
-    let use_docker = DockerOptionsBuilder::default()
-        .root_dir("../../")
-        .build()
-        .unwrap();
-
+    // Use native compilation on your metal CPUs - no Docker!
     let guest_options = GuestOptionsBuilder::default()
-        .use_docker(use_docker)
         .build()
         .unwrap();
     let kernel_elf = guest_options.kernel();
     // Generate Rust source files for the methods crate.
     let guests = embed_method_metadata_with_options(HashMap::from([("guests", guest_options)]));
 
-    if guests.len() != 1 {
-        panic!("expected exactly one guest, found {}", guests.len());
+    if guests.is_empty() {
+        panic!("expected at least one guest, found none");
     };
+    
+    // Use the first guest (or you can specify which one by name)
+    let guest = &guests[0];
+    println!("Using guest: {}", guest.name);
 
-    let user_elf = std::fs::read(guests[0].path.to_string()).unwrap();
+    let user_elf = std::fs::read(guest.path.to_string()).unwrap();
     let binary = ProgramBinary::new(&user_elf, &kernel_elf);
     let image_id = binary.compute_image_id().unwrap();
     let image_id_words = image_id.as_words().to_vec();

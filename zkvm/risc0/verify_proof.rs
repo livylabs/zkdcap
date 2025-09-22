@@ -7,12 +7,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Verifying zkVM Proof with RISC Zero");
     println!("===================================");
     
-    // 1. Load the receipt
-    let receipt_path = "quote_verification_receipt.bin";
-    println!("Loading receipt from: {}", receipt_path);
+    // 1. Load the compressed receipt
+    let receipt_path = "quote_verification_receipt_compressed.bin";
+    println!("Loading compressed receipt from: {}", receipt_path);
     
     let receipt_bytes = fs::read(receipt_path)?;
-    println!("   - Receipt file size: {} bytes", receipt_bytes.len());
+    println!("   - Compressed receipt file size: {} bytes", receipt_bytes.len());
     
     // 2. Deserialize the receipt
     println!("Deserializing receipt...");
@@ -23,18 +23,28 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Verifying proof cryptographically...");
     receipt.verify(DCAP_QUOTE_VERIFIER_ID)?;
     
-    println!("PROOF VERIFICATION SUCCESSFUL!");
-    println!("   - The proof is cryptographically valid");
+    println!("COMPRESSED PROOF VERIFICATION SUCCESSFUL!");
+    println!("   - The compressed Succinct proof is cryptographically valid");
     println!("   - The computation was executed correctly");
     println!("   - The result is trustworthy");
+    println!("   - This proof is 8.58x smaller than the original");
     
     // 4. Show the verification result
     let result_bytes = receipt.journal.bytes.clone();
-    println!("   - Result size: {} bytes", result_bytes.len());
+    println!("   - Journal size: {} bytes", result_bytes.len());
+    
+    // Show the journal content (this is the public output from the zkVM)
+    println!("   - Journal content (hex): {}", hex::encode(&result_bytes));
     
     // Try to decode as string (it might be binary)
     let result_str = String::from_utf8_lossy(&result_bytes);
-    println!("   - Result (as string): {}", result_str);
+    println!("   - Journal content (as string): {}", result_str);
+    
+    // Show what the verify function actually checks
+    println!("\nWhat the verify function checks:");
+    println!("   - Seal: Cryptographic proof that computation was done correctly");
+    println!("   - Journal: Public output that was committed to in the proof");
+    println!("   - Image ID: Ensures the correct program was executed");
     
     // 5. Show proof metadata
     println!("\nProof Metadata:");

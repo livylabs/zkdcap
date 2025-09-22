@@ -14,6 +14,18 @@ path = "lightweight_host.rs"
 name = "verify_proof"
 path = "verify_proof.rs"
 
+[[bin]]
+name = "generate_compressed_proof"
+path = "generate_compressed_proof.rs"
+
+[[bin]]
+name = "generate_solidity_verifier"
+path = "generate_solidity_verifier.rs"
+
+[[bin]]
+name = "extract_proof_for_chain"
+path = "extract_proof_for_chain.rs"
+
 [dependencies]
 risc0-zkvm = { version = "=3.0.3", default-features = false, features = ["prove"] }
 dcap-quote-verifier = { path = "../../crates/quote-verifier" }
@@ -22,6 +34,8 @@ base64 = "0.22"
 serde_json = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
 bincode = "1.3"
+hex = "0.4"
+num_cpus = "1.0"
 
 [build-dependencies]
 risc0-build  = { version = "=3.0.3", features = ["unstable"] }

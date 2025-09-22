@@ -1,2 +1,18 @@
 target/
 /Cargo.lock
+
+# Forge generated files
+zkvm/risc0/verifier/out/
+zkvm/risc0/verifier/cache/
+zkvm/risc0/verifier/broadcast/
+zkvm/risc0/verifier/lib/
+
+# Proof files (too large and generated)
+*.bin
+*_hex.txt
+quote_verification_*
+
+# Debug and temporary files
+debug_quote/
+livyquote/
+quote.txt

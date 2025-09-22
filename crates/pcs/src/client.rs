@@ -4,7 +4,7 @@ use dcap_quote_verifier::cert::{
 };
 use dcap_quote_verifier::collateral::QvCollateral;
 use dcap_quote_verifier::sgx_extensions::extract_sgx_extensions;
-use dcap_types::quotes::CertData;
+use dcap_types::quotes::{CertData, QeReportCertData};
 use dcap_types::utils::{parse_pem, pem_to_der};
 use log::*;
 
@@ -53,7 +53,7 @@ impl PCSClient {
     /// Get the collateral required for verifying a DCAP quote.
     ///
     /// # Arguments
-    /// * `qe_cert_data` - The certificate data of the QE that generated the quote to be verified. The certificate data type must be 5.
+    /// * `qe_cert_data` - The certificate data of the QE that generated the quote to be verified. Supports types 5 and 6.
     pub fn get_collateral(
         &self,
         is_sgx: bool,
@@ -66,10 +66,31 @@ impl PCSClient {
         } else {
             format!("{pcs_url}/tdx/certification/v4")
         };
-        if qe_cert_data.cert_data_type != 5 {
-            bail!("QE Cert Type must be 5".to_string());
-        }
-        let certchain_pems = parse_pem(&qe_cert_data.cert_data)
+        
+        // Handle different certificate data types
+        let actual_cert_data = match qe_cert_data.cert_data_type {
+            5 => {
+                // Type 5: Direct certificate chain
+                qe_cert_data.cert_data.clone()
+            },
+            6 => {
+                // Type 6: QE Report Certification Data - extract nested QE cert data
+                let qe_report_cert_data = QeReportCertData::from_bytes(&qe_cert_data.cert_data)
+                    .map_err(|e| anyhow!("cannot parse QE Report Cert Data: {}", e))?;
+                
+                // Check if the nested QE cert data is type 5
+                if qe_report_cert_data.qe_cert_data.cert_data_type != 5 {
+                    bail!("Nested QE Cert Type must be 5, got {}", qe_report_cert_data.qe_cert_data.cert_data_type);
+                }
+                
+                qe_report_cert_data.qe_cert_data.cert_data.clone()
+            },
+            _ => {
+                bail!("QE Cert Type must be 5 or 6, got {}", qe_cert_data.cert_data_type);
+            }
+        };
+        
+        let certchain_pems = parse_pem(&actual_cert_data)
             .map_err(|e| anyhow!("cannot parse QE cert chain: {}", e))?;
 
         let certchain = parse_certchain(&certchain_pems)

@@ -16,7 +16,7 @@ use dcap_types::cert::SgxExtensions;
 use dcap_types::enclave_identity::EnclaveIdentityV2;
 use dcap_types::quotes::{
     body::{EnclaveReport, QuoteBody},
-    CertData, Quote, QuoteHeader,
+    CertData, Quote, QuoteHeader, QeReportCertData,
 };
 use dcap_types::tcb_info::TcbInfo;
 use dcap_types::utils::parse_pem;
@@ -93,12 +93,32 @@ fn verify_quote_common(
     current_time: u64,
 ) -> Result<(QeTcb, SgxExtensions, TcbInfo, Validity)> {
     // get the certchain embedded in the ecda quote signature data
-    // this can be one of 5 types, and we only support type 5
+    // we support types 5 and 6
     // https://github.com/intel/SGXDataCenterAttestationPrimitives/blob/aa239d25a437a28f3f4de92c38f5b6809faac842/QuoteGeneration/quote_wrapper/common/inc/sgx_quote_3.h#L63C4-L63C112
-    if qe_cert_data.cert_data_type != 5 {
-        bail!("QE Cert Type must be 5");
-    }
-    let certchain_pems = parse_pem(&qe_cert_data.cert_data)?;
+    
+    // Handle different certificate data types
+    let actual_cert_data = match qe_cert_data.cert_data_type {
+        5 => {
+            // Type 5: Direct certificate chain
+            qe_cert_data.cert_data.clone()
+        },
+        6 => {
+            // Type 6: QE Report Certification Data - extract nested QE cert data
+            let qe_report_cert_data = QeReportCertData::from_bytes(&qe_cert_data.cert_data)?;
+            
+            // Check if the nested QE cert data is type 5
+            if qe_report_cert_data.qe_cert_data.cert_data_type != 5 {
+                bail!("Nested QE Cert Type must be 5, got {}", qe_report_cert_data.qe_cert_data.cert_data_type);
+            }
+            
+            qe_report_cert_data.qe_cert_data.cert_data.clone()
+        },
+        _ => {
+            bail!("QE Cert Type must be 5 or 6, got {}", qe_cert_data.cert_data_type);
+        }
+    };
+    
+    let certchain_pems = parse_pem(&actual_cert_data)?;
     let (pck_leaf_cert, pck_issuer_cert) = {
         let mut certchain = parse_certchain(&certchain_pems)?;
         // certchain in the cert_data whose type is 5 should have 3 certificates:

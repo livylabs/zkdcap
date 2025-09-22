@@ -11,12 +11,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     println!("Original receipt size: {} bytes", receipt_bytes.len());
     
-    // Create prover with Succinct receipt kind (constant size, no Docker needed)
+    // Create prover with Groth16 receipt kind (smallest possible proof)
     let prover = default_prover();
-    let opts = ProverOpts::succinct(); // This creates a Succinct receipt (constant size)
+    let opts = ProverOpts::groth16(); // This creates a Groth16 receipt (smallest size)
     
-    println!("Compressing proof to Succinct format (constant size)...");
-    println!("This may take several minutes - compression is computationally intensive...");
+    println!("Compressing proof to Groth16 format (smallest possible)...");
+    println!("This may take several minutes - Groth16 compression is computationally intensive...");
     
     // Compress the receipt
     let start_time = std::time::Instant::now();
@@ -50,8 +50,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let seal_hex = format!("0x{}", hex::encode(&seal_bytes));
     let journal_hex = format!("0x{}", hex::encode(&journal_bytes));
     
-    fs::write("seal_compressed_hex.txt", seal_hex)?;
-    fs::write("journal_compressed_hex.txt", journal_hex)?;
+    fs::write("seal_compressed_hexgroth.txt", seal_hex)?;
+    fs::write("journal_compressed_hexgroth.txt", journal_hex)?;
     
     println!("Compressed proof data saved:");
     println!("   - seal_compressed_hex.txt: {} chars", fs::read_to_string("seal_compressed_hex.txt")?.len());

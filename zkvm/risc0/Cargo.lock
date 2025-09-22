@@ -5783,6 +5783,7 @@ dependencies = [
  "dcap-pcs",
  "dcap-quote-verifier",
  "hex",
+ "num_cpus",
  "risc0-binfmt",
  "risc0-build",
  "risc0-zkvm",

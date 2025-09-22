@@ -38,7 +38,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Verifying compressed receipt...");
     compressed_receipt.verify(zkdcap_risc0::DCAP_QUOTE_VERIFIER_ID)?;
     
-    println!("✅ Compressed proof generated and verified successfully!");
+    println!("✅ Groth16 compressed proof generated and verified successfully!");
     println!("   - Original size: {} bytes", receipt_bytes.len());
     println!("   - Compressed size: {} bytes", compressed_bytes.len());
     println!("   - Compression ratio: {:.2}x", receipt_bytes.len() as f64 / compressed_bytes.len() as f64);

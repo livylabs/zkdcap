@@ -50,12 +50,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let seal_hex = format!("0x{}", hex::encode(&seal_bytes));
     let journal_hex = format!("0x{}", hex::encode(&journal_bytes));
     
-    fs::write("seal_compressed_hexgroth.txt", seal_hex)?;
-    fs::write("journal_compressed_hexgroth.txt", journal_hex)?;
+    fs::write("seal_compressed_hex_groth16.txt", seal_hex)?;
+    fs::write("journal_compressed_hex_groth16.txt", journal_hex)?;
     
     println!("Compressed proof data saved:");
-    println!("   - seal_compressed_hex.txt: {} chars", fs::read_to_string("seal_compressed_hex.txt")?.len());
-    println!("   - journal_compressed_hex.txt: {} chars", fs::read_to_string("journal_compressed_hex.txt")?.len());
+    println!("   - seal_compressed_hex_groth16.txt: {} chars", fs::read_to_string("seal_compressed_hex_groth16.txt")?.len());
+    println!("   - journal_compressed_hex_groth16.txt: {} chars", fs::read_to_string("journal_compressed_hex_groth16.txt")?.len());
     
     Ok(())
 }

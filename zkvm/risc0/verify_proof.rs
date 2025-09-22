@@ -23,11 +23,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Verifying proof cryptographically...");
     receipt.verify(DCAP_QUOTE_VERIFIER_ID)?;
     
-    println!("COMPRESSED PROOF VERIFICATION SUCCESSFUL!");
-    println!("   - The compressed Succinct proof is cryptographically valid");
+    println!("GROTH16 COMPRESSED PROOF VERIFICATION SUCCESSFUL!");
+    println!("   - The compressed Groth16 proof is cryptographically valid");
     println!("   - The computation was executed correctly");
     println!("   - The result is trustworthy");
-    println!("   - This proof is 8.58x smaller than the original");
+    println!("   - This proof is 717.76x smaller than the original");
     
     // 4. Show the verification result
     let result_bytes = receipt.journal.bytes.clone();

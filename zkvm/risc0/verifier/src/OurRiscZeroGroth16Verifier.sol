@@ -12,8 +12,8 @@ contract OurRiscZeroGroth16Verifier is Groth16Verifier {
     // RISC Zero Image ID for the DCAP quote verifier
     bytes32 public constant IMAGE_ID = 0xc700937f6407fbb924f499ade8d9b40769b25f2af00e6d82aa019deaa504273a;
     
-    // Expected selector for our proof (0x02000000)
-    bytes4 public constant EXPECTED_SELECTOR = 0x02000000;
+    // Expected selector for our proof (0x73c457ba)
+    bytes4 public constant EXPECTED_SELECTOR = 0x73c457ba;
     
     // Control root for RISC Zero 3.0.3
     bytes32 public constant CONTROL_ROOT = 0x3b304d1098ad401d3a04bc11976f476633a71b482b7851189663ca61209abe45;

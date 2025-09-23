@@ -11,24 +11,8 @@ name = "lightweight_host"
 path = "lightweight_host.rs"
 
 [[bin]]
-name = "verify_proof"
-path = "verify_proof.rs"
-
-[[bin]]
-name = "generate_compressed_proof"
-path = "generate_compressed_proof.rs"
-
-[[bin]]
-name = "generate_solidity_verifier"
-path = "generate_solidity_verifier.rs"
-
-[[bin]]
-name = "extract_proof_for_chain"
-path = "extract_proof_for_chain.rs"
-
-[[bin]]
-name = "extract_verification_key"
-path = "extract_verification_key.rs"
+name = "generate_true_groth16_proof"
+path = "generate_true_groth16_proof.rs"
 
 [dependencies]
 risc0-zkvm = { version = "=3.0.3", default-features = false, features = ["prove"] }

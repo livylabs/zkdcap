@@ -28,9 +28,6 @@ contract DeployOurVerifier is Script {
         console.log("=== DEPLOYMENT SUCCESSFUL ===");
         console.log("Verifier deployed to:", address(verifier));
         console.log("Image ID:", vm.toString(verifier.IMAGE_ID()));
-        console.log("Expected Selector:", vm.toString(verifier.EXPECTED_SELECTOR()));
-        console.log("Control Root:", vm.toString(verifier.CONTROL_ROOT()));
-        console.log("BN254 Control ID:", vm.toString(verifier.BN254_CONTROL_ID()));
         
         console.log("Deployment completed successfully!");
     }

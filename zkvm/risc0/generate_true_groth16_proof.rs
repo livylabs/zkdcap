@@ -1,4 +1,4 @@
-use risc0_zkvm::{default_prover, ProverOpts, ExecutorEnv};
+use risc0_zkvm::{default_prover, ProverOpts, ExecutorEnv, Receipt};
 use std::fs;
 use zkdcap_risc0::DCAP_QUOTE_VERIFIER_ID;
 use dcap_quote_verifier::types::quotes::Quote;
@@ -8,6 +8,10 @@ use serde_json::Value;
 use chrono::Utc;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Set memory optimization environment variables
+    std::env::set_var("RUST_LOG", "info");
+    // std::env::set_var("RISC0_DEV_MODE", "1"); // Commented out - we need real proofs
+    
     println!("=== GENERATING TRUE GROTH16 PROOF FROM SCRATCH ===");
     
     // 1. Prepare the inputs (copying from lightweight_host.rs but for Groth16)
@@ -65,7 +69,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .build()?;
 
     // 3. Load the guest program (the compiled zkVM binary)
-    let guest_binary = include_bytes!("artifacts/dcap-quote-verifier");
+    let guest_binary = include_bytes!("target/riscv-guest/zkdcap-risc0/guests/riscv32im-risc0-zkvm-elf/release/dcap_quote_verifier");
     
     // 4. Create prover with Groth16 receipt kind (TRUE Groth16 from start)
     println!("Creating prover with Groth16 receipt kind...");
@@ -92,6 +96,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let receipt_bytes = bincode::serialize(&groth16_receipt.receipt)?;
     fs::write(receipt_path, &receipt_bytes)?;
     println!("Groth16 receipt saved to: {}", receipt_path);
+    
+    // Debug: Print receipt structure information
+    println!("\n=== RECEIPT STRUCTURE DEBUG ===");
+    println!("Receipt type: {:?}", std::any::type_name_of_val(&groth16_receipt.receipt));
+    println!("Seal length: {} bytes", groth16_receipt.receipt.seal.len());
+    println!("Image ID: {:?}", groth16_receipt.receipt.claim.image_id);
+    println!("Exit code: {:?}", groth16_receipt.receipt.claim.exit_code);
+    
+    // The journal is in the claim, not directly in the receipt
+    // Let's see what's in the claim
+    println!("Claim type: {:?}", std::any::type_name_of_val(&groth16_receipt.receipt.claim));
+    
+    // Print seal preview (first 50 bytes)
+    let seal_preview = &groth16_receipt.receipt.seal[..std::cmp::min(50, groth16_receipt.receipt.seal.len())];
+    println!("Seal preview (first 50 bytes): {:?}", seal_preview);
     
     // 8. Extract components for on-chain verification
     println!("\n=== EXTRACTING COMPONENTS FOR ON-CHAIN VERIFICATION ===");

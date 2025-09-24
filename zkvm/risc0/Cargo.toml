@@ -14,6 +14,10 @@ path = "lightweight_host.rs"
 name = "generate_true_groth16_proof"
 path = "generate_true_groth16_proof.rs"
 
+[[bin]]
+name = "extract_from_bin"
+path = "extract_from_bin.rs"
+
 [dependencies]
 risc0-zkvm = { version = "=3.0.3", default-features = false, features = ["prove"] }
 dcap-quote-verifier = { path = "../../crates/quote-verifier" }
